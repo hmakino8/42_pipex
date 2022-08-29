@@ -59,6 +59,7 @@ bb↩️
 aaa↩️
 cccccccccc↩️
 ```
+Run
 ```sh
 $ ./pipex infile 'grep "aaa"' 'wc -l' "tr -d ' '" outfile
 $ ./pipex here_doc LIMITER cat 'grep "Hello"' "awk '{print \$3}'" outfile
