@@ -3,7 +3,7 @@
 ### Program name
 `pipex`
 ### Description
-A project that implements pipes and redirects to mimic unix commands
+A project to mimic unix commands pipe, redirect, and heredoc
 - Allowed external functions are below
   - `access`
   - `open`
@@ -60,15 +60,13 @@ aaa↩️
 cccccccccc↩️
 ```
 ```sh
-$ ./pipex infile 'grep aaa' 'wc -l' "tr -d ' '" outfile
-```
-It should be the same as:
-```sh
-$ < infile ls -l | wc -l > outfile
-```
-$ ./pipex
-```sh
+$ ./pipex infile 'grep "aaa"' 'wc -l' "tr -d ' '" outfile
 $ ./pipex here_doc LIMITER cat 'grep "Hello"' "awk '{print \$3}'" outfile
+```
+They should be the same:
+```sh
+$ < infile grep "aaa" | wc -l | tr -d ' ' > outfile
+$ cat << LIMITER | grep "Hello" | awk '{print $3} >> outfile
 ```
 Type in heredocument as below
 ```sh
