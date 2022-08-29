@@ -60,7 +60,7 @@ aaa↩️
 cccccccccc↩️
 ```
 ```sh
-$ ./pipex infile 'grep aaa' 'wc -l' outfile
+$ ./pipex infile 'grep aaa' 'wc -l' "tr -d ' '" outfile
 ```
 It should be the same as:
 ```sh
@@ -68,14 +68,15 @@ $ < infile ls -l | wc -l > outfile
 ```
 $ ./pipex
 ```sh
-$ ./pipex here_doc cat 'grep "Hello"' "awk '{print \$2}'" outfile
+$ ./pipex here_doc LIMITER cat 'grep "Hello"' "awk '{print \$3}'" outfile
 ```
 Type in heredocument as below
 ```sh
 $ heredoc> a
 $ heredoc> b
-$ heredoc> Hello 42$
+$ heredoc> Hello 4 2 Tokyo
+$ heredoc> Hello 42 Tokyo
 $ heredoc> c
 $ heredoc> LIMITER
 ```
-Then the character "4" and "42" should be written to outfile
+Then the character "4", "2" and "Tokyo" should be written to outfile
