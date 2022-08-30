@@ -62,12 +62,12 @@ cccccccccc
 Run
 ```sh
 $ ./pipex infile 'grep "aaa"' 'wc -l' "tr -d ' '" outfile
-$ ./pipex here_doc LIMITER cat 'grep "Hello"' "awk '{print \$3}'" outfile
+$ ./pipex here_doc LIMITER cat 'grep "Hello"' "awk '{print $3}'" outfile
 ```
 They should be the same:
 ```sh
 $ < infile grep "aaa" | wc -l | tr -d ' ' > outfile
-$ cat << LIMITER | grep "Hello" | awk '{print $3} >> outfile
+$ cat << LIMITER | grep "Hello" | awk '{print $3}' >> outfile
 ```
 Type in heredocument as below
 ```sh
