@@ -3,7 +3,7 @@
 ### Program name
 `pipex`
 ### Description
-project to mimic unix commands pipe, redirect, and heredoc
+The purpose of this project is the discovery in detail UNIX mechanism - pipe.
 - Allowed external functions are below
   - `access`
   - `open`
