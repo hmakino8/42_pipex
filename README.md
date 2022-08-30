@@ -3,7 +3,7 @@
 ### Program name
 `pipex`
 ### Description
-A project to mimic unix commands pipe, redirect, and heredoc
+project to mimic unix commands pipe, redirect, and heredoc
 - Allowed external functions are below
   - `access`
   - `open`
