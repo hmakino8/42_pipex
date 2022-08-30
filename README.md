@@ -50,14 +50,14 @@ $ cmd << LIMITER | cmd1 | cmd2 | cmd3 ... cmdn >> file
 Prepare a file like below
 - infile
 ```
-a↩️
-aaa↩️
-aa↩️
-aaa↩️
-aaaa↩️
-bb↩️
-aaa↩️
-cccccccccc↩️
+a
+aaa
+aa
+aaa
+aaaa
+bb
+aaa
+cccccccccc
 ```
 Run
 ```sh
