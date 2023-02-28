@@ -6,7 +6,7 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 07:26:41 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/01 03:22:23 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/01 04:06:47 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,11 @@ void	get_files(int argc, char **argv, t_info *info)
 	outfile = argv[argc - 1];
 	info->fd[IN] = open(infile, O_RDONLY);
 	if (info->fd[IN] < 0)
+	{
+		if (errno == ENOENT)
+			error_exit(ERR_CMD, infile, info);
 		error_exit(0, "open", info);
+	}
 	info->fd[OUT] = open(outfile, O_CREAT | O_RDWR | O_TRUNC, 0644);
 	if (info->fd[OUT] < 0)
 		error_exit(0, "open", info);

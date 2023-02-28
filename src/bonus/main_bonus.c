@@ -6,7 +6,7 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 07:19:26 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/01 03:47:01 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/01 03:50:10 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,3 @@ static void	get_info(int argc, char *argv[], t_info *info)
 	get_paths(info);
 	get_pipes(argc, info);
 }
-
-//__attribute__((destructor)) static void destructor()
-//{
-//	system("leaks -q pipex");
-//}

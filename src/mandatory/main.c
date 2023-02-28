@@ -6,7 +6,7 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 07:19:26 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/01 03:46:43 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/01 03:50:22 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,3 @@ int	main(int argc, char *argv[])
 	free_alloc_memory(&info);
 	return (stat);
 }
-
-//__attribute__((destructor)) static void destructor()
-//{
-//	system("leaks -q pipex");
-//}
