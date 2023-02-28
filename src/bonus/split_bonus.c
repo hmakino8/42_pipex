@@ -6,11 +6,36 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/27 17:02:30 by hiroaki           #+#    #+#             */
-/*   Updated: 2022/07/03 02:43:32 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/01 03:15:53 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
+
+static size_t	element_count(char *cmds);
+static char		*elem_join_case_quotation(char *cmds, t_info *info);
+static char		*elem_join_case_other(char *cmds, t_info *info);
+static void		element_copy(char *cmds, size_t cnt, t_info *info);
+
+void	split_cmds(char *cmds, t_info *info)
+{
+	size_t	cnt;
+	size_t	i;
+
+	if (cmds == NULL)
+		return ;
+	cnt = element_count(cmds);
+	info->cmd = malloc(sizeof(char *) * (cnt + 1));
+	if (errno == ENOMEM)
+		error_exit(0, "malloc", info);
+	i = 0;
+	while (i < cnt)
+	{
+		info->cmd[i] = NULL;
+		i++;
+	}
+	return (element_copy(cmds, cnt, info));
+}
 
 static size_t	element_count(char *cmds)
 {
@@ -25,7 +50,7 @@ static size_t	element_count(char *cmds)
 			q_mark = *cmds++;
 			while (*cmds && *cmds != q_mark)
 				cmds++;
-			cmds++;
+			cmds += (*cmds != '\0');
 		}
 		else if (*cmds && !ft_isspace(*cmds))
 		{
@@ -41,7 +66,7 @@ static size_t	element_count(char *cmds)
 	return (cnt);
 }
 
-static char	*elem_join_case_quotation(char *cmds, t_pipex *px)
+static char	*elem_join_case_quotation(char *cmds, t_info *info)
 {
 	size_t	len;
 	char	*tmp;
@@ -52,16 +77,14 @@ static char	*elem_join_case_quotation(char *cmds, t_pipex *px)
 	while (cmds[len] && cmds[len] != q_mark)
 		len++;
 	tmp = ft_substr(cmds, 0, len);
-	if (!tmp)
-		exit_fail(0, NULL, px);
-	px->cmd[px->idx] = ft_strjoin(px->cmd[px->idx], tmp);
+	info->cmd[info->idx] = ft_strjoin(info->cmd[info->idx], tmp);
 	free(tmp);
-	if (!px->cmd[px->idx])
-		exit_fail(0, NULL, px);
-	return (cmds + len + 1);
+	if (errno == ENOMEM)
+		error_exit(0, "malloc", info);
+	return (&cmds[len + 1]);
 }
 
-static char	*elem_join_case_other(char *cmds, t_pipex *px)
+static char	*elem_join_case_other(char *cmds, t_info *info)
 {
 	size_t	len;
 	char	*tmp;
@@ -71,46 +94,30 @@ static char	*elem_join_case_other(char *cmds, t_pipex *px)
 		!is_quotation_mark(cmds[len]))
 		len++;
 	tmp = ft_substr(cmds, 0, len);
-	if (!tmp)
-		exit_fail(0, NULL, px);
-	px->cmd[px->idx] = ft_strjoin(px->cmd[px->idx], tmp);
+	info->cmd[info->idx] = ft_strjoin(info->cmd[info->idx], tmp);
 	free(tmp);
-	if (!px->cmd[px->idx])
-		exit_fail(0, NULL, px);
-	return (cmds + len);
+	if (errno == ENOMEM)
+		error_exit(0, "malloc", info);
+	return (&cmds[len]);
 }
 
-static void	element_copy(char *cmds, size_t cnt, t_pipex *px)
+static void	element_copy(char *cmds, size_t cnt, t_info *info)
 {
-	px->idx = 0;
-	while (*cmds && px->idx < cnt)
+	info->idx = 0;
+	while (*cmds && info->idx < cnt)
 	{
 		if (ft_isspace(*cmds))
 		{
-			px->idx++;
+			info->idx++;
 			while (*cmds && ft_isspace(*cmds))
 				cmds++;
 		}
 		while (*cmds && !ft_isspace(*cmds))
 		{
 			if (is_quotation_mark(*cmds))
-				cmds = elem_join_case_quotation(cmds, px);
+				cmds = elem_join_case_quotation(cmds, info);
 			else if (*cmds && !ft_isspace(*cmds))
-				cmds = elem_join_case_other(cmds, px);
+				cmds = elem_join_case_other(cmds, info);
 		}
 	}
-}
-
-void	split_cmds(char *cmds, t_pipex *px)
-{
-	size_t	cnt;
-
-	if (!cmds)
-		return ;
-	cnt = element_count(cmds);
-	px->cmd = (char **)malloc(sizeof(char *) * (cnt + 1));
-	if (!px->cmd)
-		exit_fail(0, NULL, px);
-	px->cmd[cnt + 1] = NULL;
-	return (element_copy(cmds, cnt, px));
 }

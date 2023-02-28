@@ -6,13 +6,44 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 07:29:23 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/01 02:33:59 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/01 03:14:22 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void	close_pipes(t_info *info)
+static void	close_pipes(t_info *info);
+static int	wait_for_child(pid_t *pid, int cnt);
+static void	duplicate_fd(int i, t_info *info);
+static void	child_process(char **argv, int i, t_info *info);
+
+int	exec_cmds(char **argv, t_info *info)
+{
+	int		i;
+	int		stat;
+	pid_t	*pid;
+
+	i = 0;
+	pid = malloc(sizeof(pid_t) * info->cmd_cnt);
+	while (i < info->cmd_cnt)
+	{
+		pid[i] = fork();
+		if (pid[i] < 0)
+			error_exit(0, "fork", info);
+		if (pid[i] == 0)
+		{
+			child_process(argv, i, info);
+			return (0);
+		}
+		i++;
+	}
+	close_pipes(info);
+	stat = wait_for_child(pid, info->cmd_cnt);
+	free(pid);
+	return (stat);
+}
+
+static void	close_pipes(t_info *info)
 {
 	int	i;
 
@@ -22,6 +53,20 @@ void	close_pipes(t_info *info)
 		close(info->pipe[i]);
 		i++;
 	}
+}
+
+static int	wait_for_child(pid_t *pid, int cnt)
+{
+	int	i;
+	int	stat;
+
+	i = 0;
+	while (i < cnt)
+	{
+		waitpid(pid[i], &stat, 0);
+		i++;
+	}
+	return (stat > 0);
 }
 
 static void	duplicate_fd(int i, t_info *info)
@@ -60,44 +105,4 @@ static void	child_process(char **argv, int i, t_info *info)
 		error_exit(ERR_CMD, info->cmd[0], info);
 	if (execve(info->fullpath, info->cmd, environ) < 0)
 		error_exit(0, "execve", info);
-}
-
-int	wait_for_child(pid_t *pid, int cnt)
-{
-	int	i;
-	int	stat;
-
-	i = 0;
-	while (i < cnt)
-	{
-		waitpid(pid[i], &stat, 0);
-		i++;
-	}
-	return (stat > 0);
-}
-
-int	exec_cmds(char **argv, t_info *info)
-{
-	int		i;
-	int		stat;
-	pid_t	*pid;
-
-	i = 0;
-	pid = malloc(sizeof(pid_t) * info->cmd_cnt);
-	while (i < info->cmd_cnt)
-	{
-		pid[i] = fork();
-		if (pid[i] < 0)
-			error_exit(0, "fork", info);
-		if (pid[i] == 0)
-		{
-			child_process(argv, i, info);
-			return (0);
-		}
-		i++;
-	}
-	close_pipes(info);
-	stat = wait_for_child(pid, info->cmd_cnt);
-	free(pid);
-	return (stat);
 }

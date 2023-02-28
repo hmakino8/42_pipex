@@ -1,20 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   main_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 07:19:26 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/01 03:46:43 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/01 03:47:01 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
+#include "pipex_bonus.h"
 
-static void	check_arg(int argc)
+static void	check_arg(int argc, char *argv[]);
+static void	get_info(int argc, char *argv[], t_info *info);
+
+int	main(int argc, char *argv[])
 {
-	if (argc != 5)
+	int		stat;
+	t_info	info;
+
+	check_arg(argc, argv);
+	get_info(argc, argv, &info);
+	stat = exec_cmds(argv, &info);
+	free_alloc_memory(&info);
+	return (stat);
+}
+
+static void	check_arg(int argc, char *argv[])
+{
+	if (argc < 5 || (!ft_strcmp(argv[1], "here_doc") && argc == 5))
 		set_error_exit(EINVAL);
 }
 
@@ -26,22 +41,10 @@ static void	get_info(int argc, char *argv[], t_info *info)
 	info->fullpath = NULL;
 	info->env = NULL;
 	info->cmd = NULL;
-	info->heredoc = false;
+	info->heredoc = !ft_strcmp(argv[1], "here_doc");
 	get_files(argc, argv, info);
 	get_paths(info);
 	get_pipes(argc, info);
-}
-
-int	main(int argc, char *argv[])
-{
-	int		stat;
-	t_info	info;
-
-	check_arg(argc);
-	get_info(argc, argv, &info);
-	stat = exec_cmds(argv, &info);
-	free_alloc_memory(&info);
-	return (stat);
 }
 
 //__attribute__((destructor)) static void destructor()

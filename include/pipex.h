@@ -6,7 +6,7 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 19:08:02 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/01 02:41:52 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/01 03:11:49 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,24 +48,25 @@ enum e_err
 	ERR_CMD,
 }	t_err;
 
-/* pipex.c */
-void	close_pipes(t_info *info);
 /* get.c */
 void	get_files(int argc, char **argv, t_info *info);
 void	get_paths(t_info *info);
 void	get_pipes(int argc, t_info *info);
 void	get_cmd(char *cmd, t_info *info);
+
 /* split.c */
 void	split_cmds(char *cmds, t_info *info);
+
 /* exec.c */
 int		exec_cmds(char **argv, t_info *info);
-/* free.c */
-void	free_alloc_memory(t_info *info);
+
 /* error.c */
 void	error_exit(int err_num, char *func, t_info *info);
 void	set_error_exit(int e);
-/* utils.c */
+
+/* pipex-helper.c */
 char	*ft_readline(char *prompt);
 bool	is_quotation_mark(char c);
+void	free_alloc_memory(t_info *info);
 
 #endif

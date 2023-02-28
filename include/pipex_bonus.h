@@ -6,7 +6,7 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 19:08:02 by hmakino           #+#    #+#             */
-/*   Updated: 2022/07/03 02:43:16 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/01 03:08:56 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,68 +20,53 @@
 # include <sys/uio.h>
 # include <sys/wait.h>
 # include <sys/types.h>
+# include <errno.h>
+# include "libft.h"
+# include "get_next_line.h"
 
-# include "../../libs/libft/libft.h"
-# include "../../libs/gnl/get_next_line.h"
-# include "../../libs/ft_dprintf/ft_dprintf.h"
+# define IN 0
+# define OUT 1
 
-typedef struct s_pipex
+typedef struct s_pipex_info
 {
-	int		i_fd;
-	int		o_fd;
-	int		h_fd;
-	int		flag_h;
 	int		cmd_cnt;
 	int		pipe_cnt;
 	int		*pipe;
+	int		fd[2];
+	bool	heredoc;
 	size_t	idx;
 	size_t	locate;
-	char	*fullpath_cmd;
-	char	**dev_envp;
+	char	*fullpath;
+	char	**env;
 	char	**cmd;
-}	t_pipex;
+}	t_info;
 
-enum
+enum e_err
 {
-	ERR_ARG = 1,
+	ERR_PATH = 1,
+	ERR_ENV,
 	ERR_CMD,
-	ERR_PIPE,
-	ERR_PATH,
-	ERR_HEREDOC,
-	FLAGGED_HEREDOC,
-};
+}	t_err;
 
-/*
- * pipex.c
- */
-void	close_pipes(t_pipex *px);
-/*
- * get.c
- */
-void	get_files(int ac, char **av, t_pipex *px);
-void	get_paths(char **envp, t_pipex *px);
-void	get_pipes(int ac, t_pipex *px);
-void	get_cmd(char *cmd, t_pipex *px);
-/*
- * split.c
- */
-void	split_cmds(char *cmds, t_pipex *px);
-/*
- * exec.c
- */
-void	exec_pipes(char **av, char **envp, t_pipex *px);
-/*
- * free.c
- */
-void	free_alloc_memory(t_pipex *px);
-/*
- * error.c
- */
-void	exit_fail(int err_num, char *err, t_pipex *px);
-/*
- * utils.c
- */
-int		is_quotation_mark(char c);
-int		ft_strcmp_gnl(const char *lmt, const char *gnl);
+/* get_bonus.c */
+void	get_files(int argc, char **argv, t_info *info);
+void	get_paths(t_info *info);
+void	get_pipes(int argc, t_info *info);
+void	get_cmd(char *cmd, t_info *info);
+
+/* split_bonus.c */
+void	split_cmds(char *cmds, t_info *info);
+
+/* exec_bonus.c */
+int		exec_cmds(char **argv, t_info *info);
+
+/* error_bonus.c */
+void	error_exit(int err_num, char *func, t_info *info);
+void	set_error_exit(int e);
+
+/* pipex-helper_bonus.c */
+char	*ft_readline(char *prompt);
+bool	is_quotation_mark(char c);
+void	free_alloc_memory(t_info *info);
 
 #endif

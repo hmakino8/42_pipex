@@ -6,73 +6,103 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 07:29:23 by hmakino           #+#    #+#             */
-/*   Updated: 2022/07/03 02:42:36 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/01 03:44:17 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
 
-void	close_pipes(t_pipex *px)
+static void	close_pipes(t_info *info);
+static void	duplicate_fd(int i, t_info *info);
+static void	child_process(char **argv, int i, t_info *info);
+static int	wait_for_child(pid_t *pid, int cnt);
+
+int	exec_cmds(char **argv, t_info *info)
+{
+	int		i;
+	int		stat;
+	pid_t	*pid;
+
+	i = 0;
+	pid = malloc(sizeof(pid_t) * info->cmd_cnt);
+	while (i < info->cmd_cnt)
+	{
+		pid[i] = fork();
+		if (pid[i] < 0)
+			error_exit(0, "fork", info);
+		if (pid[i] == 0)
+		{
+			child_process(argv, i, info);
+			return (0);
+		}
+		i++;
+	}
+	close_pipes(info);
+	stat = wait_for_child(pid, info->cmd_cnt);
+	free(pid);
+	return (stat);
+}
+
+static void	close_pipes(t_info *info)
 {
 	int	i;
 
 	i = 0;
-	while (i < px->pipe_cnt)
-		close(px->pipe[i++]);
+	while (i < info->pipe_cnt)
+	{
+		close(info->pipe[i]);
+		i++;
+	}
 }
 
-static void	duplicate_fd(int idx, t_pipex *px)
+static void	duplicate_fd(int i, t_info *info)
+{
+	int	j;
+
+	j = 2 * i - 2;
+	if (i == 0)
+	{
+		dup2(info->fd[IN], STDIN_FILENO);
+		dup2(info->pipe[1], STDOUT_FILENO);
+	}
+	else if (i == info->cmd_cnt - 1)
+	{
+		dup2(info->pipe[j], STDIN_FILENO);
+		dup2(info->fd[OUT], STDOUT_FILENO);
+	}
+	else
+	{
+		dup2(info->pipe[j], STDIN_FILENO);
+		dup2(info->pipe[j + 3], STDOUT_FILENO);
+	}
+}
+
+static void	child_process(char **argv, int i, t_info *info)
+{
+	extern char	**environ;
+
+	duplicate_fd(i, info);
+	close_pipes(info);
+	split_cmds(argv[2 + info->heredoc + i], info);
+	if (info->cmd == NULL)
+		error_exit(ERR_CMD, argv[2 + info->heredoc + i], info);
+	get_cmd(info->cmd[0], info);
+	if (info->fullpath == NULL)
+		error_exit(ERR_CMD, info->cmd[0], info);
+	if (execve(info->fullpath, info->cmd, environ) < 0)
+		error_exit(0, "execve", info);
+}
+
+static int	wait_for_child(pid_t *pid, int cnt)
 {
 	int	i;
+	int	stat;
 
-	i = 2 * idx - 2;
-	if (idx == 0)
+	i = 0;
+	while (i < cnt)
 	{
-		dup2(px->i_fd, 0);
-		dup2(px->pipe[1], 1);
+		waitpid(pid[i], &stat, 0);
+		i++;
 	}
-	else if (idx == px->cmd_cnt - 1)
-	{
-		dup2(px->pipe[i], 0);
-		dup2(px->o_fd, 1);
-	}
-	else
-	{
-		dup2(px->pipe[i], 0);
-		dup2(px->pipe[i + 3], 1);
-	}
-}
-
-static void	child_process(char **av, char **envp, int i, t_pipex *px)
-{
-	duplicate_fd(i, px);
-	close_pipes(px);
-	if (px->flag_h == FLAGGED_HEREDOC)
-		split_cmds(av[3 + i], px);
-	else
-		split_cmds(av[2 + i], px);
-	if (!px->cmd)
-		exit_fail(0, NULL, px);
-	get_cmd(px->cmd[0], px);
-	if (!px->fullpath_cmd)
-		exit_fail(ERR_CMD, px->cmd[0], px);
-	if (execve(px->fullpath_cmd, px->cmd, envp) < 0)
-		exit_fail(0, "execve", px);
-	exit(EXIT_SUCCESS);
-}
-
-void	exec_pipes(char **av, char **envp, t_pipex *px)
-{
-	int		i;
-	pid_t	pid;
-
-	i = -1;
-	while (++i < px->cmd_cnt)
-	{
-		pid = fork();
-		if (pid < 0)
-			exit_fail(0, "fork", px);
-		if (!pid)
-			child_process(av, envp, i, px);
-	}
+	return (stat > 0);
 }

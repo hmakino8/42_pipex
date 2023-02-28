@@ -6,49 +6,19 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 07:26:41 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/01 02:46:08 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/01 03:22:23 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-static int	heredoc_to_fd(char *limiter, t_info *info)
-{
-	int		fd[2];
-	char	*line;
-
-	if (pipe(fd) < 0)
-		error_exit(0, "pipe", info);
-	while (1)
-	{
-		line = ft_readline("heredoc> ");
-		if (line == NULL || !ft_strcmp(line, limiter))
-			break ;
-		ft_putendl_fd(line, fd[1]);
-		free(line);
-	}
-	free(line);
-	close(fd[1]);
-	return (fd[0]);
-}
-
 void	get_files(int argc, char **argv, t_info *info)
 {
 	char	*infile;
 	char	*outfile;
-	char	*limiter;
 
 	infile = argv[1];
 	outfile = argv[argc - 1];
-	limiter = argv[2];
-	if (info->heredoc)
-	{
-		info->fd[IN] = heredoc_to_fd(limiter, info);
-		info->fd[OUT] = open(outfile, O_WRONLY | O_CREAT | O_APPEND, 0644);
-		if (info->fd[OUT] < 0)
-			error_exit(0, "open", info);
-		return ;
-	}
 	info->fd[IN] = open(infile, O_RDONLY);
 	if (info->fd[IN] < 0)
 		error_exit(0, "open", info);
@@ -82,7 +52,7 @@ void	get_pipes(int argc, t_info *info)
 {
 	int	i;
 
-	info->cmd_cnt = argc - (3 + info->heredoc);
+	info->cmd_cnt = argc - 3;
 	info->pipe_cnt = 2 * (info->cmd_cnt - 1);
 	info->pipe = malloc(sizeof(int) * info->pipe_cnt);
 	if (errno == ENOMEM)

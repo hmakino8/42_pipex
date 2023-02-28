@@ -1,16 +1,49 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   free_bonus.c                                       :+:      :+:    :+:   */
+/*   pipex-helper_bonus.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/13 07:28:16 by hmakino           #+#    #+#             */
-/*   Updated: 2022/07/03 02:42:45 by hiroaki          ###   ########.fr       */
+/*   Created: 2022/06/28 09:32:17 by hiroaki           #+#    #+#             */
+/*   Updated: 2023/03/01 03:05:40 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
+
+static void	free_double_ptr(char **d_ptr);
+
+bool	is_quotation_mark(char c)
+{
+	return (c == '\'' || c == '"');
+}
+
+char	*ft_readline(char *prompt)
+{
+	char	*line;
+	char	*ret;
+
+	ft_putstr_fd(prompt, STDERR_FILENO);
+	line = get_next_line(STDIN_FILENO);
+	if (line == NULL)
+		return (NULL);
+	ret = ft_strtrim(line, "\n");
+	free(line);
+	return (ret);
+}
+
+void	free_alloc_memory(t_info *info)
+{
+	if (info == NULL)
+		return ;
+	free(info->pipe);
+	free(info->fullpath);
+	if (info->env)
+		free_double_ptr(info->env);
+	if (info->cmd)
+		free_double_ptr(info->cmd);
+}
 
 static void	free_double_ptr(char **d_ptr)
 {
@@ -23,14 +56,4 @@ static void	free_double_ptr(char **d_ptr)
 		i++;
 	}
 	free(d_ptr);
-}
-
-void	free_alloc_memory(t_pipex *px)
-{
-	free(px->pipe);
-	free(px->fullpath_cmd);
-	if (px->dev_envp)
-		free_double_ptr(px->dev_envp);
-	if (px->cmd)
-		free_double_ptr(px->cmd);
 }

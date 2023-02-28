@@ -6,114 +6,122 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 07:26:41 by hmakino           #+#    #+#             */
-/*   Updated: 2022/07/03 02:42:54 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/01 03:02:33 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
 
-static void	get_heredoc(char *limiter, t_pipex *px)
-{
-	int		cmp;
-	char	*gnl;
+static int	heredoc_to_fd(char *limiter, t_info *info);
 
-	px->h_fd = open(".heredoc", O_CREAT | O_WRONLY | O_TRUNC, 0000644);
-	if (px->h_fd < 0)
-		return (exit_fail(ERR_HEREDOC, NULL, px));
-	cmp = 1;
-	while (cmp)
-	{
-		ft_dprintf(1, "%s", "heredoc> ");
-		gnl = get_next_line(0);
-		if (!gnl)
-			break ;
-		cmp = ft_strcmp_gnl(limiter, gnl);
-		if (cmp)
-			ft_dprintf(px->h_fd, "%s", gnl);
-		free(gnl);
-	}
-	close(px->h_fd);
-}
-
-void	get_files(int ac, char **av, t_pipex *px)
+void	get_files(int argc, char **argv, t_info *info)
 {
-	if (px->flag_h == FLAGGED_HEREDOC)
+	char	*infile;
+	char	*outfile;
+	char	*limiter;
+
+	infile = argv[1];
+	outfile = argv[argc - 1];
+	limiter = argv[2];
+	if (info->heredoc)
 	{
-		get_heredoc(av[2], px);
-		px->i_fd = open(".heredoc", O_RDONLY);
-		if (px->i_fd < 0)
-			return (exit_fail(ERR_HEREDOC, NULL, px));
-		px->o_fd = open(av[ac - 1], O_WRONLY | O_CREAT | O_APPEND, 0000644);
-		if (px->o_fd < 0)
-			return (exit_fail(ERR_HEREDOC, NULL, px));
+		info->fd[IN] = heredoc_to_fd(limiter, info);
+		info->fd[OUT] = open(outfile, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		if (info->fd[OUT] < 0)
+			error_exit(0, "open", info);
 		return ;
 	}
-	px->i_fd = open(av[1], O_RDONLY);
-	if (px->i_fd < 0)
-		return (exit_fail(0, av[1], px));
-	px->o_fd = open(av[ac - 1], O_CREAT | O_RDWR | O_TRUNC, 0000644);
-	if (px->o_fd < 0)
-		return (exit_fail(0, av[ac - 1], px));
+	info->fd[IN] = open(infile, O_RDONLY);
+	if (info->fd[IN] < 0)
+		error_exit(0, "open", info);
+	info->fd[OUT] = open(outfile, O_CREAT | O_RDWR | O_TRUNC, 0644);
+	if (info->fd[OUT] < 0)
+		error_exit(0, "open", info);
 }
 
-void	get_paths(char **envp, t_pipex *px)
+void	get_paths(t_info *info)
 {
+	extern char	**environ;
+	char		**env;
+
+	env = environ;
+	if (env == NULL)
+		error_exit(ERR_ENV, NULL, info);
 	while (1)
 	{
-		if (!*envp)
-			return (exit_fail(ERR_PATH, NULL, px));
-		if (!ft_strncmp("PATH", *envp, 4))
+		if (*env == NULL)
+			error_exit(ERR_PATH, NULL, info);
+		if (!ft_strncmp("PATH=", *env, 5))
 			break ;
-		envp++;
+		env++;
 	}
-	px->dev_envp = ft_split(*envp + 5, ':');
-	if (!px->dev_envp)
-		return (exit_fail(0, NULL, px));
+	info->env = ft_split(*env + 5, ':');
+	if (errno == ENOMEM)
+		error_exit(0, "malloc", info);
 }
 
-void	get_pipes(int ac, t_pipex *px)
+void	get_pipes(int argc, t_info *info)
 {
 	int	i;
 
-	if (px->flag_h == FLAGGED_HEREDOC)
-		px->cmd_cnt = ac - 4;
-	else
-		px->cmd_cnt = ac - 3;
-	px->pipe_cnt = 2 * (px->cmd_cnt - 1);
-	px->pipe = malloc(sizeof(int) * px->pipe_cnt);
-	if (!px->pipe)
-		return (exit_fail(0, NULL, px));
+	info->cmd_cnt = argc - (3 + info->heredoc);
+	info->pipe_cnt = 2 * (info->cmd_cnt - 1);
+	info->pipe = malloc(sizeof(int) * info->pipe_cnt);
+	if (errno == ENOMEM)
+		return (error_exit(0, "malloc", info));
 	i = 0;
-	while (i < px->cmd_cnt - 1)
+	while (i < info->cmd_cnt - 1)
 	{
-		if (pipe(px->pipe + 2 * i++) < 0)
-			return (exit_fail(0, "pipe", px));
+		if (pipe(info->pipe + 2 * i) < 0)
+			return (error_exit(0, "pipe", info));
+		i++;
 	}
 }
 
-void	get_cmd(char *cmd, t_pipex *px)
+void	get_cmd(char *cmd, t_info *info)
 {
 	int		i;
 	char	*tmp;
 
-	i = -1;
 	tmp = NULL;
-	while (px->dev_envp[++i])
+	i = 0;
+	while (info->env[i])
 	{
-		if (!ft_strchr(cmd, '/'))
+		if (ft_strchr(cmd, '/') == NULL)
 		{
-			tmp = ft_strjoin(px->dev_envp[i], "/");
-			if (!tmp)
-				exit_fail(0, NULL, px);
+			tmp = ft_strjoin(info->env[i], "/");
+			if (errno == ENOMEM)
+				error_exit(0, "malloc", info);
 		}
-		px->fullpath_cmd = ft_strjoin(tmp, cmd);
+		info->fullpath = ft_strjoin(tmp, cmd);
 		free(tmp);
 		tmp = NULL;
-		if (!px->fullpath_cmd)
-			exit_fail(0, NULL, px);
-		if (access(px->fullpath_cmd, 0) == 0)
+		if (errno == ENOMEM)
+			error_exit(0, "malloc", info);
+		if (!access(info->fullpath, 0))
 			return ;
-		free(px->fullpath_cmd);
-		px->fullpath_cmd = NULL;
+		free(info->fullpath);
+		info->fullpath = NULL;
+		i++;
 	}
+}
+
+static int	heredoc_to_fd(char *limiter, t_info *info)
+{
+	int		fd[2];
+	char	*line;
+
+	if (pipe(fd) < 0)
+		error_exit(0, "pipe", info);
+	while (1)
+	{
+		line = ft_readline("heredoc> ");
+		if (line == NULL || !ft_strcmp(line, limiter))
+			break ;
+		ft_putendl_fd(line, fd[1]);
+		free(line);
+	}
+	free(line);
+	close(fd[1]);
+	return (fd[0]);
 }

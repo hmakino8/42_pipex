@@ -18,20 +18,18 @@ SRCS	=	main.c \
 			get.c \
 			exec.c \
 			split.c \
-			free.c \
 			error.c \
-			utils.c
+			pipex-helper.c
 
 SRCS_PATH	= 	$(addprefix ./src/mandatory/, $(SRCS))
 OBJS_PATH	=	$(SRCS_PATH:%.c=%.o)
 
-BONUS_SRCS	=	pipex_bonus.c \
+BONUS_SRCS	=	main_bonus.c \
 				get_bonus.c \
 				exec_bonus.c \
 				split_bonus.c \
-				free_bonus.c \
 				error_bonus.c \
-				utils_bonus.c
+				pipex-helper_bonus.c
 
 BONUS_PATH		= 	$(addprefix ./src/bonus/, $(BONUS_SRCS))
 BONUS_OBJS_PATH	=	$(BONUS_PATH:%.c=%.o)
