@@ -6,7 +6,7 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 17:49:47 by hiroaki           #+#    #+#             */
-/*   Updated: 2023/03/02 21:51:39 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/03 00:59:51 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,9 @@ void	parse_cmd(char *cmds, t_info *info)
 		return ;
 	cnt = element_count(cmds);
 	info->cmd = malloc(sizeof(char *) * (cnt + 1));
-	info->cmd[cnt] = NULL;
 	if (errno == ENOMEM)
 		error_exit(0, "malloc", info);
+	info->cmd[cnt] = NULL;
 	i = 0;
 	while (i < cnt)
 	{
