@@ -1,22 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   error_bonus.c                                      :+:      :+:    :+:   */
+/*   error_exit.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 02:36:33 by hiroaki           #+#    #+#             */
-/*   Updated: 2023/03/01 04:09:02 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/02 21:01:45 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex_bonus.h"
+#include "pipex.h"
 
 void	error_exit(int sig, char *str, t_info *info)
 {
 	int	fd;
+	int	stat;
 
 	fd = STDERR_FILENO;
+	stat = EXIT_FAILURE;
 	ft_putstr_fd("pipex: ", fd);
 	if (sig == ERR_PATH)
 		ft_putendl_fd("invalid path", fd);
@@ -26,11 +28,12 @@ void	error_exit(int sig, char *str, t_info *info)
 	{
 		ft_putstr_fd(str, fd);
 		ft_putendl_fd(": command not found", fd);
+		stat = 127;
 	}
 	else
 		perror(str);
 	free_alloc_memory(info);
-	exit(EXIT_FAILURE);
+	exit(stat);
 }
 
 void	set_error_exit(int e)

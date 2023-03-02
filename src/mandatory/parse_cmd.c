@@ -1,23 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   split.c                                            :+:      :+:    :+:   */
+/*   parse_cmd.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/27 17:02:30 by hiroaki           #+#    #+#             */
-/*   Updated: 2023/03/01 03:17:12 by hiroaki          ###   ########.fr       */
+/*   Created: 2023/03/02 17:49:47 by hiroaki           #+#    #+#             */
+/*   Updated: 2023/03/02 21:51:19 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
 static size_t	element_count(char *cmds);
-static char		*elem_join_case_quotation(char *cmds, t_info *info);
-static char		*elem_join_case_other(char *cmds, t_info *info);
+static char		*elem_join_case_quotation(size_t i, char *cmds, t_info *info);
+static char		*elem_join_case_other(size_t i, char *cmds, t_info *info);
 static void		element_copy(char *cmds, size_t cnt, t_info *info);
 
-void	split_cmds(char *cmds, t_info *info)
+void	parse_cmd(char *cmds, t_info *info)
 {
 	size_t	cnt;
 	size_t	i;
@@ -26,6 +26,7 @@ void	split_cmds(char *cmds, t_info *info)
 		return ;
 	cnt = element_count(cmds);
 	info->cmd = malloc(sizeof(char *) * (cnt + 1));
+	info->cmd[cnt] = NULL;
 	if (errno == ENOMEM)
 		error_exit(0, "malloc", info);
 	i = 0;
@@ -66,7 +67,7 @@ static size_t	element_count(char *cmds)
 	return (cnt);
 }
 
-static char	*elem_join_case_quotation(char *cmds, t_info *info)
+static char	*elem_join_case_quotation(size_t i, char *cmds, t_info *info)
 {
 	size_t	len;
 	char	*tmp;
@@ -77,14 +78,14 @@ static char	*elem_join_case_quotation(char *cmds, t_info *info)
 	while (cmds[len] && cmds[len] != q_mark)
 		len++;
 	tmp = ft_substr(cmds, 0, len);
-	info->cmd[info->idx] = ft_strjoin(info->cmd[info->idx], tmp);
+	info->cmd[i] = ft_strjoin(info->cmd[i], tmp);
 	free(tmp);
 	if (errno == ENOMEM)
 		error_exit(0, "malloc", info);
 	return (&cmds[len + 1]);
 }
 
-static char	*elem_join_case_other(char *cmds, t_info *info)
+static char	*elem_join_case_other(size_t i, char *cmds, t_info *info)
 {
 	size_t	len;
 	char	*tmp;
@@ -94,7 +95,7 @@ static char	*elem_join_case_other(char *cmds, t_info *info)
 		!is_quotation_mark(cmds[len]))
 		len++;
 	tmp = ft_substr(cmds, 0, len);
-	info->cmd[info->idx] = ft_strjoin(info->cmd[info->idx], tmp);
+	info->cmd[i] = ft_strjoin(info->cmd[i], tmp);
 	free(tmp);
 	if (errno == ENOMEM)
 		error_exit(0, "malloc", info);
@@ -103,21 +104,23 @@ static char	*elem_join_case_other(char *cmds, t_info *info)
 
 static void	element_copy(char *cmds, size_t cnt, t_info *info)
 {
-	info->idx = 0;
-	while (*cmds && info->idx < cnt)
+	size_t	i;
+
+	i = 0;
+	while (*cmds && i < cnt)
 	{
 		if (ft_isspace(*cmds))
 		{
-			info->idx++;
+			i++;
 			while (*cmds && ft_isspace(*cmds))
 				cmds++;
 		}
 		while (*cmds && !ft_isspace(*cmds))
 		{
 			if (is_quotation_mark(*cmds))
-				cmds = elem_join_case_quotation(cmds, info);
+				cmds = elem_join_case_quotation(i, cmds, info);
 			else if (*cmds && !ft_isspace(*cmds))
-				cmds = elem_join_case_other(cmds, info);
+				cmds = elem_join_case_other(i, cmds, info);
 		}
 	}
 }

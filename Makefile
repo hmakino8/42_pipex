@@ -15,20 +15,22 @@ CFLAGS	=	-Wall -Wextra -Werror $(INC)
 INC		=	-I./include -I./libs/libft/ -I./libs/gnl/
 
 SRCS	=	main.c \
-			get.c \
-			exec.c \
-			split.c \
-			error.c \
+			get_info.c \
+			exec_cmd.c \
+			parse_cmd.c \
+			error_exit.c \
+			connect_pipes.c \
 			pipex-helper.c
 
 SRCS_PATH	= 	$(addprefix ./src/mandatory/, $(SRCS))
 OBJS_PATH	=	$(SRCS_PATH:%.c=%.o)
 
 BONUS_SRCS	=	main_bonus.c \
-				get_bonus.c \
-				exec_bonus.c \
-				split_bonus.c \
-				error_bonus.c \
+				get_info_bonus.c \
+				exec_cmd_bonus.c \
+				parse_cmd_bonus.c \
+				error_exit_bonus.c \
+				connect_pipes_bonus.c \
 				pipex-helper_bonus.c
 
 BONUS_PATH		= 	$(addprefix ./src/bonus/, $(BONUS_SRCS))

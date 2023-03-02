@@ -6,7 +6,7 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/28 09:32:17 by hiroaki           #+#    #+#             */
-/*   Updated: 2023/03/01 03:05:40 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/02 20:31:39 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 static void	free_double_ptr(char **d_ptr);
 
-bool	is_quotation_mark(char c)
+bool	is_quotation_mark(char ch)
 {
-	return (c == '\'' || c == '"');
+	return (ch == '\'' || ch == '"');
 }
 
 char	*ft_readline(char *prompt)
@@ -37,7 +37,6 @@ void	free_alloc_memory(t_info *info)
 {
 	if (info == NULL)
 		return ;
-	free(info->pipe);
 	free(info->fullpath);
 	if (info->env)
 		free_double_ptr(info->env);
