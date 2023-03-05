@@ -17,7 +17,6 @@ INC		=	-I./include -I./libs/libft/ -I./libs/gnl/
 SRCS	=	main.c \
 			get_info.c \
 			exec_cmd.c \
-			parse_cmd.c \
 			error_exit.c \
 			connect_pipes.c \
 			pipex-helper.c

@@ -6,7 +6,7 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/22 16:33:46 by hmakino           #+#    #+#             */
-/*   Updated: 2022/06/24 05:55:48 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/06 02:33:17 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ char	*ft_strchr(const char *s, int c)
 {
 	char	ch;
 
+	if (s == NULL)
+		return (NULL);
 	ch = (char)c;
 	while (*s || (!*s && !ch))
 	{
