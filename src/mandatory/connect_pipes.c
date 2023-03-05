@@ -6,7 +6,7 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 17:43:01 by hiroaki           #+#    #+#             */
-/*   Updated: 2023/03/02 21:01:33 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/06 01:50:24 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,16 +15,16 @@
 static void	set_stdin(int fd[2], t_info *info);
 static void	set_stdout(int fd[2], t_info *info);
 
-void	connect_io_pipe(int i, int pp[OPEN_MAX / 2][2], t_info *info)
+void	connect_io_pipe(int i, int pipe_fd[2][2], t_info *info)
 {
 	if (i == 0)
-		set_stdout(pp[i], info);
+		set_stdout(pipe_fd[CUR], info);
 	else if (i == info->pipe_cnt)
-		set_stdin(pp[i - 1], info);
+		set_stdin(pipe_fd[PREV], info);
 	else
 	{
-		set_stdin(pp[i - 1], info);
-		set_stdout(pp[i], info);
+		set_stdin(pipe_fd[PREV], info);
+		set_stdout(pipe_fd[CUR], info);
 	}
 }
 
@@ -42,10 +42,10 @@ void	connect_io_file(int i, t_info *info)
 	}
 }
 
-void	set_pipe(int pp[2], t_info *info)
+void	close_io_fd(int fd[2])
 {
-	if (pipe(pp) == -1)
-		error_exit(0, "pipe", info);
+	close(fd[0]);
+	close(fd[1]);
 }
 
 static void	set_stdin(int fd[2], t_info *info)

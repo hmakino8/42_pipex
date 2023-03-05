@@ -6,7 +6,7 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 19:08:02 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/02 21:08:12 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/06 01:50:32 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,10 @@
 # include "libft.h"
 # include "get_next_line.h"
 
-# ifndef OPEN_MAX
-#  define OPEN_MAX 512
-# endif
+# define IN 0
+# define OUT 1
+# define PREV 0
+# define CUR 1
 
 typedef struct s_pipex_info
 {
@@ -47,9 +48,7 @@ enum e_err
 }	t_err;
 
 /* get_info.c */
-void	get_files(int argc, char **argv, t_info *info);
-void	get_paths(t_info *info);
-void	get_pipes(int argc, t_info *info);
+void	get_info(int argc, char *argv[], t_info *info);
 void	get_cmd(char *cmd, t_info *info);
 
 /* parse_cmd.c */
@@ -57,12 +56,11 @@ void	parse_cmd(char *cmds, t_info *info);
 
 /* exec_cmd.c */
 void	exec_cmds(char **argv, t_info *info);
-void	close_io_fd(int fd[2]);
 
 /* connect_pipes.c */
-void	set_pipe(int pp[2], t_info *info);
-void	connect_io_pipe(int i, int pp[OPEN_MAX / 2][2], t_info *info);
+void	connect_io_pipe(int i, int pipe_fd[2][2], t_info *info);
 void	connect_io_file(int i, t_info *info);
+void	close_io_fd(int fd[2]);
 
 /* error_exit.c */
 void	error_exit(int sig, char *str, t_info *info);
