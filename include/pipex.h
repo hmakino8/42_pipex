@@ -6,22 +6,14 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 19:08:02 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/06 03:44:06 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/06 04:32:19 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PIPEX_H
 # define PIPEX_H
 
-# include <stdio.h>
-# include <string.h>
-# include <stdbool.h>
-# include <sys/uio.h>
-# include <sys/wait.h>
-# include <sys/types.h>
-# include <errno.h>
 # include "libft.h"
-# include "get_next_line.h"
 
 # define IN 0
 # define OUT 1
@@ -46,7 +38,7 @@ enum e_err
 }	t_err;
 
 /* get_info.c */
-void	get_info(int argc, char *argv[], t_info *info);
+void	get_io_file(int argc, char **argv, t_info *info);
 void	get_env(char **env, t_info *info);
 void	get_cmd(char *cmd_arg, t_info *info);
 void	get_cmd_path(t_info *info);

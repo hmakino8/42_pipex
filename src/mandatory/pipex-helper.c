@@ -6,25 +6,11 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/28 09:32:17 by hiroaki           #+#    #+#             */
-/*   Updated: 2023/03/06 03:32:00 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/06 03:49:16 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-char	*ft_readline(char *prompt)
-{
-	char	*line;
-	char	*ret;
-
-	ft_putstr_fd(prompt, STDERR_FILENO);
-	line = get_next_line(STDIN_FILENO);
-	if (line == NULL)
-		return (NULL);
-	ret = ft_strtrim(line, "\n");
-	free(line);
-	return (ret);
-}
 
 void	free_double_ptr(char **d_ptr)
 {

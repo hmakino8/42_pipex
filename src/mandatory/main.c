@@ -6,12 +6,13 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 07:19:26 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/06 03:32:41 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/06 04:29:06 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
+static void	init_info(int argc, t_info *info);
 static void	check_arg(int argc);
 static void	put_usage(void);
 static void	wait_child(t_info *info);
@@ -21,7 +22,8 @@ int	main(int argc, char *argv[])
 	t_info	info;
 
 	check_arg(argc);
-	get_info(argc, argv, &info);
+	init_info(argc, &info);
+	get_io_file(argc, argv, &info);
 	exec_pipes(argv, &info);
 	wait_child(&info);
 	free_double_ptr(info.env);
@@ -34,6 +36,16 @@ static void	check_arg(int argc)
 		return ;
 	put_usage();
 	exit(EXIT_FAILURE);
+}
+
+static void	init_info(int argc, t_info *info)
+{
+	info->stat = 0;
+	info->cmd_cnt = argc - 3;
+	info->pipe_cnt = info->cmd_cnt - 1;
+	info->env = NULL;
+	info->cmd[1] = NULL;
+	info->cmd[2] = NULL;
 }
 
 static void	put_usage(void)

@@ -12,12 +12,11 @@
 
 NAME	=	pipex
 CFLAGS	=	-Wall -Wextra -Werror $(INC)
-INC		=	-I./include -I./libs/libft/ -I./libs/gnl/
+INC		=	-I./include -I./libs/include
 
 SRCS	=	main.c \
 			get_info.c \
 			exec_cmd.c \
-			error_exit.c \
 			connect_pipes.c \
 			pipex-helper.c
 
@@ -41,23 +40,19 @@ endif
 
 all:	$(NAME)
 
-$(NAME):	$(OBJS_PATH) $(LIBFT) $(GNL)
-	$(MAKE) -C ./libs/libft
-	$(MAKE) -C ./libs/gnl
-	$(CC) $(OBJS_PATH) $(LIBFT) $(GNL) $(CFLAGS) -o $(NAME)
+$(NAME):	$(OBJS_PATH) $(LIBFT)
+	$(MAKE) -C ./libs
+	$(CC) $(OBJS_PATH) $(LIBFT) $(CFLAGS) -o $(NAME)
 
-LIBFT	=	./libs/libft/libft.a
-GNL		=	./libs/gnl/libftgnl.a
+LIBFT	=	./libs/libft.a
 
 clean:
-	$(MAKE) -C ./libs/libft clean
-	$(MAKE) -C ./libs/gnl clean
+	$(MAKE) -C ./libs clean
 	$(RM) $(OBJS_PATH)
 	$(RM) $(BONUS_OBJS_PATH)
 
 fclean:	clean
 	$(RM) $(LIBFT)
-	$(RM) $(GNL)
 	$(RM) $(NAME)
 
 re:	fclean all

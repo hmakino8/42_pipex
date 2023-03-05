@@ -6,7 +6,7 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 07:29:23 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/06 03:45:07 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/06 04:19:14 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,6 @@ static void	exec_cmd(char *cmd_arg, t_info *info)
 	char		*tmp;
 	extern char	**environ;
 
-	info->cmd[1] = NULL;
-	info->cmd[2] = NULL;
 	get_cmd(cmd_arg, info);
 	get_env(environ, info);
 	tmp = info->cmd[0];
