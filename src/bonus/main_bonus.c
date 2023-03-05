@@ -6,29 +6,33 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 07:19:26 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/06 02:22:04 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/06 05:33:10 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
 
+static void	init_info(int argc, t_info *info);
 static void	check_arg(int argc, char *argv[], t_info *info);
-static void	get_info(int argc, char *argv[], t_info *info);
 static void	put_usage(bool heredoc);
+static void	wait_child(t_info *info);
 
 int	main(int argc, char *argv[])
 {
 	t_info	info;
 
 	check_arg(argc, argv, &info);
-	get_info(argc, argv, &info);
-	exec_cmds(argv, &info);
-	free_alloc_memory(&info);
+	init_info(argc, &info);
+	get_io_file(argc, argv, &info);
+	exec_pipes(argv, &info);
+	wait_child(&info);
+	free_double_ptr(info.env);
 	return (info.stat);
 }
 
 static void	check_arg(int argc, char *argv[], t_info *info)
 {
+	info->heredoc = false;
 	if (argc > 1)
 		info->heredoc = !ft_strcmp(argv[1], "here_doc");
 	if (argc <= 5)
@@ -58,16 +62,28 @@ static void	put_usage(bool heredoc)
 	ft_putendl_fd("< file1 cmd1 | cmd2 | cmd3 ... | cmdn > file2", fd);
 }
 
-static void	get_info(int argc, char *argv[], t_info *info)
+static void	init_info(int argc, t_info *info)
 {
 	info->stat = 0;
-	info->fullpath = NULL;
-	info->env = NULL;
-	info->cmd = NULL;
 	info->cmd_cnt = argc - (3 + info->heredoc);
 	info->pipe_cnt = info->cmd_cnt - 1;
-	get_files(argc, argv, info);
-	get_paths(info);
+	info->env = NULL;
+	info->cmd[1] = NULL;
+	info->cmd[2] = NULL;
+}
+
+static void	wait_child(t_info *info)
+{
+	int	i;
+
+	i = 0;
+	while (i < info->cmd_cnt)
+	{
+		wait(&info->stat);
+		if (WIFEXITED(info->stat))
+			info->stat = WEXITSTATUS(info->stat);
+		i++;
+	}
 }
 
 //__attribute__((destructor)) static void destructor()

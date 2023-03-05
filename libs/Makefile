@@ -6,7 +6,7 @@
 #    By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/02/06 17:10:58 by hiroaki           #+#    #+#              #
-#    Updated: 2023/03/06 04:10:21 by hiroaki          ###   ########.fr        #
+#    Updated: 2023/03/06 05:23:55 by hiroaki          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -50,6 +50,7 @@ STRING			:=	src/string/ft_bzero.c \
 					src/string/ft_strlcpy.c \
 					src/string/ft_strlen.c \
 					src/string/ft_strmapi.c \
+					src/string/ft_strcmp.c \
 					src/string/ft_strncmp.c \
 					src/string/ft_strnstr.c \
 					src/string/ft_strrchr.c \

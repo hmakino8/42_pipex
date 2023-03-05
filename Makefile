@@ -26,8 +26,6 @@ OBJS_PATH	=	$(SRCS_PATH:%.c=%.o)
 BONUS_SRCS	=	main_bonus.c \
 				get_info_bonus.c \
 				exec_cmd_bonus.c \
-				parse_cmd_bonus.c \
-				error_exit_bonus.c \
 				connect_pipes_bonus.c \
 				pipex-helper_bonus.c
 

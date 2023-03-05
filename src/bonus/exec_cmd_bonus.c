@@ -6,60 +6,69 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 07:29:23 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/03 09:07:21 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/06 05:39:07 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
 
-void		close_io_fd(int fd[2]);
-static void	exec_pipes(char **argv, int i, t_info *info);
+static void	exec_cmd(char *cmd_arg, t_info *info);
+static void	switch_pipe_fd(int pipe_fd[2][2]);
+static void	set_pipe(int pipe_fd[2][2]);
 
-void	exec_cmds(char **argv, t_info *info)
+void	exec_pipes(char **argv, t_info *info)
 {
 	int		i;
-	int		pp[OPEN_MAX / 2][2];
+	int		pipe_fd[2][2];
 	pid_t	pid;
 
 	i = 0;
 	while (i < info->cmd_cnt)
 	{
 		if (i != info->pipe_cnt)
-			set_pipe(pp[i], info);
+			set_pipe(pipe_fd);
 		pid = fork();
 		if (pid == -1)
-			error_exit(0, "fork", info);
+			error_exit(0, "fork");
 		if (pid == 0)
 		{
-			connect_io_pipe(i, pp, info);
+			connect_io_pipe(i, pipe_fd, info);
 			connect_io_file(i, info);
-			exec_pipes(argv, i, info);
+			exec_cmd(argv[2 + info->heredoc + i], info);
 		}
+		free(info->cmd[0]);
 		if (i > 0)
-			close_io_fd(pp[i - 1]);
-		wait(&info->stat);
+			close_io_fd(pipe_fd[PREV]);
+		switch_pipe_fd(pipe_fd);
 		i++;
 	}
-	info->stat = info->stat >> 8;
 }
 
-void	close_io_fd(int fd[2])
+static void	exec_cmd(char *cmd_arg, t_info *info)
 {
-	close(fd[0]);
-	close(fd[1]);
-}
-
-static void	exec_pipes(char **argv, int i, t_info *info)
-{
+	char		*tmp;
 	extern char	**environ;
 
-	parse_cmd(argv[2 + info->heredoc + i], info);
-	if (info->cmd == NULL)
-		error_exit(ERR_CMD, argv[2 + info->heredoc + i], info);
-	get_cmd(info->cmd[0], info);
-	if (info->fullpath == NULL)
-		error_exit(ERR_CMD, info->cmd[0], info);
-	if (execve(info->fullpath, info->cmd, environ) < 0)
+	get_cmd(cmd_arg, info);
+	get_env(environ, info);
+	tmp = info->cmd[0];
+	get_cmd_path(info);
+	if (info->cmd[0] == NULL)
+		error_exit(ERR_CMD, tmp);
+	info->cmd[1] = ft_strtrim(info->cmd[1], "\'");
+	if (execve(info->cmd[0], info->cmd, environ) == -1)
 		perror("execve");
 	exit(EXIT_FAILURE);
+}
+
+static void	switch_pipe_fd(int pipe_fd[2][2])
+{
+	pipe_fd[PREV][IN] = pipe_fd[CUR][IN];
+	pipe_fd[PREV][OUT] = pipe_fd[CUR][OUT];
+}
+
+static void	set_pipe(int pipe_fd[2][2])
+{
+	if (pipe(pipe_fd[CUR]) == -1)
+		error_exit(0, "pipe");
 }

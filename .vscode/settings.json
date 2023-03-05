@@ -4,6 +4,7 @@
 		"get_next_line.h": "c",
 		"libft.h": "c",
 		"ft_string.h": "c",
-		"ft_stdlib.h": "c"
+		"ft_stdlib.h": "c",
+		"pipex_bonus.h": "c"
 	}
 }

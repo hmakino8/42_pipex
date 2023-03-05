@@ -1,104 +1,113 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_bonus.c                                        :+:      :+:    :+:   */
+/*   get_info_bonus.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 07:26:41 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/01 16:05:36 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/06 05:25:40 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
 
-static int	heredoc_to_fd(char *limiter, t_info *info);
+static int	heredoc_to_fd(char *limiter);
 
-void	get_files(int argc, char **argv, t_info *info)
+void	get_io_file(int argc, char **argv, t_info *info)
 {
-	char	*infile;
-	char	*outfile;
+	char	*in;
+	char	*out;
 	char	*limiter;
 
-	infile = argv[1];
-	outfile = argv[argc - 1];
+	in = argv[1];
+	out = argv[argc - 1];
 	limiter = argv[2];
 	if (info->heredoc)
 	{
-		info->io_file[0] = heredoc_to_fd(limiter, info);
-		info->io_file[1] = open(outfile, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		info->io_file[0] = heredoc_to_fd(limiter);
+		info->io_file[1] = open(out, O_WRONLY | O_CREAT | O_APPEND, 0644);
 		if (info->io_file[1] < 0)
-			error_exit(0, "open", info);
+			error_exit(0, "open");
 		return ;
 	}
-	info->io_file[0] = open(infile, O_RDONLY);
+	info->io_file[0] = open(in, O_RDONLY);
 	if (info->io_file[0] < 0)
 	{
 		if (errno == ENOENT)
-			error_exit(0, infile, info);
-		error_exit(0, "open", info);
+			error_exit(0, in);
+		error_exit(0, "open");
 	}
-	info->io_file[1] = open(outfile, O_CREAT | O_RDWR | O_TRUNC, 0644);
+	info->io_file[1] = open(out, O_CREAT | O_RDWR | O_TRUNC, 0644);
 	if (info->io_file[1] < 0)
-		error_exit(0, "open", info);
+		error_exit(0, "open");
 }
 
-void	get_paths(t_info *info)
+void	get_env(char **env, t_info *info)
 {
-	extern char	**environ;
-	char		**env;
-
-	env = environ;
 	if (env == NULL)
-		error_exit(ERR_ENV, NULL, info);
+		error_exit(ERR_ENV, NULL);
 	while (1)
 	{
 		if (*env == NULL)
-			error_exit(ERR_PATH, NULL, info);
+			error_exit(ERR_PATH, NULL);
 		if (!ft_strncmp("PATH=", *env, 5))
 			break ;
 		env++;
 	}
 	info->env = ft_split(*env + 5, ':');
 	if (errno == ENOMEM)
-		error_exit(0, "malloc", info);
+		error_exit(0, "malloc");
 }
 
-void	get_cmd(char *cmd, t_info *info)
+void	get_cmd(char *cmd_arg, t_info *info)
 {
-	int		i;
 	char	*tmp;
 
-	tmp = NULL;
-	i = 0;
-	while (info->env[i])
+	tmp = ft_strchr(cmd_arg, ' ');
+	if (tmp == NULL)
+		info->cmd[0] = cmd_arg;
+	else
 	{
-		if (ft_strchr(cmd, '/') == NULL)
-		{
-			tmp = ft_strjoin(info->env[i], "/");
-			if (errno == ENOMEM)
-				error_exit(0, "malloc", info);
-		}
-		info->fullpath = ft_strjoin(tmp, cmd);
-		free(tmp);
-		tmp = NULL;
-		if (errno == ENOMEM)
-			error_exit(0, "malloc", info);
-		if (!access(info->fullpath, 0))
-			return ;
-		free(info->fullpath);
-		info->fullpath = NULL;
-		i++;
+		cmd_arg[tmp - cmd_arg] = '\0';
+		info->cmd[0] = cmd_arg;
+		info->cmd[1] = tmp + 1;
 	}
 }
 
-static int	heredoc_to_fd(char *limiter, t_info *info)
+void	get_cmd_path(t_info *info)
+{
+	int		i;
+	char	*tmp;
+	char	*cmd_path;
+
+	tmp = NULL;
+	cmd_path = NULL;
+	i = 0;
+	while (info->env[i])
+	{
+		if (ft_strchr(info->cmd[0], '/') == NULL)
+			tmp = ft_strjoin(info->env[i], "/");
+		cmd_path = ft_strjoin(tmp, info->cmd[0]);
+		if (errno == ENOMEM)
+			error_exit(0, "malloc");
+		free(tmp);
+		if (!access(cmd_path, 0))
+			break ;
+		free(cmd_path);
+		cmd_path = NULL;
+		i++;
+	}
+	info->cmd[0] = cmd_path;
+}
+
+static int	heredoc_to_fd(char *limiter)
 {
 	int		fd[2];
 	char	*line;
 
 	if (pipe(fd) < 0)
-		error_exit(0, "pipe", info);
+		error_exit(0, "pipe");
 	while (1)
 	{
 		line = ft_readline("heredoc> ");
