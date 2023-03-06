@@ -6,7 +6,7 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 07:29:23 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/06 19:39:31 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/06 20:29:21 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void	exec_pipes(t_info *info)
 
 static void	exec_cmd(int i, int pipe_fd[2][2], t_info *info)
 {
-	extern char **environ;
+	extern char	**environ;
 
 	connect_io_pipe(i, info->pipe_cnt, pipe_fd);
 	connect_io_file(i, info->pipe_cnt, info);

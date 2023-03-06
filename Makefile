@@ -56,9 +56,15 @@ fclean:	clean
 re:	fclean all
 
 test:
+	make re
 	./.test.sh
+
+bonustest:
+	make fclean
+	make bonus
+	./.test_bonus.sh
 
 bonus:
 	make WITH_BONUS=1
 
-.PHONY:	all clean fclean re bonus test
+.PHONY:	all clean fclean re bonus test bonustest
