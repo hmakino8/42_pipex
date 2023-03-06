@@ -6,61 +6,47 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 07:26:41 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/06 04:41:14 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/06 19:38:49 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void	get_io_file(int argc, char **argv, t_info *info)
+void	get_io_file(t_info *info)
 {
-	char	*in;
-	char	*out;
+	char	*infile;
+	char	*outfile;
 
-	in = argv[1];
-	out = argv[argc - 1];
-	info->io_file[0] = open(in, O_RDONLY);
-	if (info->io_file[0] < 0)
+	infile = info->agv[1];
+	outfile = info->agv[info->agc - 1];
+	info->io_file[IN] = open(infile, O_RDONLY);
+	if (info->io_file[IN] < 0)
 	{
 		if (errno == ENOENT)
-			error_exit(0, in);
-		error_exit(0, "open");
+			perror(infile);
+		else
+			error_exit(0, "open");
 	}
-	info->io_file[1] = open(out, O_CREAT | O_RDWR | O_TRUNC, 0644);
-	if (info->io_file[1] < 0)
+	info->io_file[OUT] = open(outfile, O_CREAT | O_RDWR | O_TRUNC, 0644);
+	if (info->io_file[OUT] < 0)
 		error_exit(0, "open");
 }
 
-void	get_env(char **env, t_info *info)
+void	get_env(char **environ, t_info *info)
 {
-	if (env == NULL)
+	if (environ == NULL)
 		error_exit(ERR_ENV, NULL);
 	while (1)
 	{
-		if (*env == NULL)
+		if (*environ == NULL)
 			error_exit(ERR_PATH, NULL);
-		if (!ft_strncmp("PATH=", *env, 5))
+		if (!ft_strncmp("PATH=", *environ, 5))
 			break ;
-		env++;
+		environ++;
 	}
-	info->env = ft_split(*env + 5, ':');
+	info->env = ft_split(*environ + 5, ':');
 	if (errno == ENOMEM)
 		error_exit(0, "malloc");
-}
-
-void	get_cmd(char *cmd_arg, t_info *info)
-{
-	char	*tmp;
-
-	tmp = ft_strchr(cmd_arg, ' ');
-	if (tmp == NULL)
-		info->cmd[0] = cmd_arg;
-	else
-	{
-		cmd_arg[tmp - cmd_arg] = '\0';
-		info->cmd[0] = cmd_arg;
-		info->cmd[1] = tmp + 1;
-	}
 }
 
 void	get_cmd_path(t_info *info)

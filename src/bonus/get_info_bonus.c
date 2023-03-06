@@ -6,7 +6,7 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 07:26:41 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/06 05:25:40 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/06 06:29:56 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,30 +16,30 @@ static int	heredoc_to_fd(char *limiter);
 
 void	get_io_file(int argc, char **argv, t_info *info)
 {
-	char	*in;
-	char	*out;
+	char	*infile;
+	char	*outfile;
 	char	*limiter;
 
-	in = argv[1];
-	out = argv[argc - 1];
+	infile = argv[1];
+	outfile = argv[argc - 1];
 	limiter = argv[2];
 	if (info->heredoc)
 	{
-		info->io_file[0] = heredoc_to_fd(limiter);
-		info->io_file[1] = open(out, O_WRONLY | O_CREAT | O_APPEND, 0644);
-		if (info->io_file[1] < 0)
+		info->io_file[IN] = heredoc_to_fd(limiter);
+		info->io_file[OUT] = open(outfile, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		if (info->io_file[OUT] < 0)
 			error_exit(0, "open");
 		return ;
 	}
-	info->io_file[0] = open(in, O_RDONLY);
-	if (info->io_file[0] < 0)
+	info->io_file[IN] = open(infile, O_RDONLY);
+	if (info->io_file[IN] < 0)
 	{
 		if (errno == ENOENT)
-			error_exit(0, in);
+			error_exit(0, infile);
 		error_exit(0, "open");
 	}
-	info->io_file[1] = open(out, O_CREAT | O_RDWR | O_TRUNC, 0644);
-	if (info->io_file[1] < 0)
+	info->io_file[OUT] = open(outfile, O_CREAT | O_RDWR | O_TRUNC, 0644);
+	if (info->io_file[OUT] < 0)
 		error_exit(0, "open");
 }
 
@@ -117,6 +117,6 @@ static int	heredoc_to_fd(char *limiter)
 		free(line);
 	}
 	free(line);
-	close(fd[1]);
-	return (fd[0]);
+	close(fd[OUT]);
+	return (fd[IN]);
 }

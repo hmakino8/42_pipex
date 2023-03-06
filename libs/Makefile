@@ -6,15 +6,13 @@
 #    By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/02/06 17:10:58 by hiroaki           #+#    #+#              #
-#    Updated: 2023/03/06 05:23:55 by hiroaki          ###   ########.fr        #
+#    Updated: 2023/03/06 06:34:36 by hiroaki          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME			:=	libft.a
 CFLAGS			:=	-Wall -Wextra -Werror
 INCLUDE			=	-I./include
-
-OBJDIR			:=	obj
 
 STDLIB			:=	src/stdlib/ft_atoi.c \
 					src/stdlib/ft_calloc.c \
@@ -73,16 +71,14 @@ STDIO			:=	src/stdio/ft_putchar_fd.c \
 					src/stdio/get_next_line/get_next_line.c \
 
 SRCS			=	$(STDIO) $(STRING) $(STDLIB)
-OBJS			=	$(SRCS:%.c=$(OBJDIR)/%.o)
-DEPS			=	$(OBJS:%.o=%.d)
+OBJS			=	$(SRCS:%.c=%.o)
 
 all:	$(NAME)
 
 $(NAME): $(OBJS)
-	@mkdir -p $(@D)
 	@ar -r $(NAME) $(OBJS)
 
-$(OBJDIR)/%.o: %.c
+%.o: %.c
 	$(CC) -c $< -o $@ $(CFLAGS) $(INCLUDE)
 
 clean:
