@@ -6,7 +6,7 @@
 #    By: hmakino <hmakino@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/03 05:02:19 by hmakino           #+#    #+#              #
-#    Updated: 2022/06/24 08:00:27 by hiroaki          ###   ########.fr        #
+#    Updated: 2023/03/09 07:22:19 by hmakino          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -60,7 +60,7 @@ test:
 	-@./.test.sh
 	make fclean -s
 
-bonustest:
+test_bonus:
 	make fclean -s
 	make bonus -s
 	-@./.test_bonus.sh
@@ -69,4 +69,4 @@ bonustest:
 bonus:
 	make WITH_BONUS=1
 
-.PHONY:	all clean fclean re bonus test bonustest
+.PHONY:	all clean fclean re bonus test test_bonus

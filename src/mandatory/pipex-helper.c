@@ -6,7 +6,7 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/28 09:32:17 by hiroaki           #+#    #+#             */
-/*   Updated: 2023/03/09 03:32:49 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/09 06:26:46 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,4 +47,18 @@ void	error_exit(int sig, char *path)
 	else
 		perror(path);
 	exit(stat);
+}
+
+char	*ft_readline(char *prompt)
+{
+	char	*line;
+	char	*ret;
+
+	ft_putstr_fd(prompt, STDERR_FILENO);
+	line = get_next_line(STDIN_FILENO);
+	if (line == NULL)
+		return (NULL);
+	ret = ft_strtrim(line, "\n");
+	free(line);
+	return (ret);
 }

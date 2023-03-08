@@ -6,7 +6,7 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 07:29:23 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/09 05:29:43 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/09 06:26:28 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ static void	exec_cmd(int i, int pipe_fd[2][2], t_info *info)
 
 	connect_io_pipe(i, info->pipe_cnt, pipe_fd);
 	connect_io_file(i, info->pipe_cnt, info);
-	get_cmd(info->agv[2 + i], environ, info);
+	get_cmd(info->agv[2 + info->heredoc + i], environ, info);
 	if (execve(info->cmd[0], info->cmd, environ) == -1)
 		error_exit(0, "execve");
 	error_exit(ERR_CMD, info->cmd[0]);

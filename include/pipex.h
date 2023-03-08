@@ -6,7 +6,7 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 19:08:02 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/09 04:20:56 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/09 06:27:34 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ typedef struct s_pipex_info
 	int		pipe_cnt;
 	int		io_file[2];
 	int		agc;
+	bool	heredoc;
 	char	**agv;
 	char	**env;
 	char	*cmd[3];
@@ -40,7 +41,7 @@ enum e_err
 }	t_err;
 
 /* get_info.c */
-void	get_io_file(char *filename, int *io_file, bool is_in);
+void	get_io_file(char *filename, int *io_file, bool is_in, bool heredoc);
 void	get_env(char **env, t_info *info);
 void	get_cmd_path(t_info *info);
 

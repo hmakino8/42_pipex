@@ -1,21 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_info.c                                         :+:      :+:    :+:   */
+/*   get_into.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/13 07:26:41 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/09 05:33:42 by hiroaki          ###   ########.fr       */
+/*   Created: 2023/03/06 22:56:06 by hiroaki           #+#    #+#             */
+/*   Updated: 2023/03/09 06:26:34 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void	get_io_file(char *filename, int *io_file, bool is_in)
+static int	heredoc_to_fd(char *limiter);
+
+void	get_io_file(char *filename, int *io_file, bool is_in, bool heredoc)
 {
 	if (is_in)
-		*io_file = open(filename, O_RDONLY);
+	{
+		if (heredoc)
+			*io_file = heredoc_to_fd(filename);
+		else
+			*io_file = open(filename, O_RDONLY);
+	}
 	else
 		*io_file = open(filename, O_CREAT | O_RDWR | O_TRUNC, 0644);
 	if (*io_file < 0)
@@ -50,7 +57,7 @@ void	get_cmd_path(t_info *info)
 	char	*cmd_path;
 
 	if (*info->cmd == NULL || **info->cmd == '\0')
-		error_exit(ERR_CMD, NULL);
+		error_exit(ERR_CMD, *info->cmd);
 	tmp = NULL;
 	cmd_path = NULL;
 	while (*info->env)
@@ -70,4 +77,24 @@ void	get_cmd_path(t_info *info)
 	if (cmd_path == NULL)
 		error_exit(ERR_CMD, *info->cmd);
 	*info->cmd = cmd_path;
+}
+
+static int	heredoc_to_fd(char *limiter)
+{
+	int		fd[2];
+	char	*line;
+
+	if (pipe(fd) < 0)
+		error_exit(0, "pipe");
+	while (1)
+	{
+		line = ft_readline("heredoc> ");
+		if (line == NULL || !ft_strcmp(line, limiter))
+			break ;
+		ft_putendl_fd(line, fd[1]);
+		free(line);
+	}
+	free(line);
+	close(fd[OUT]);
+	return (fd[IN]);
 }

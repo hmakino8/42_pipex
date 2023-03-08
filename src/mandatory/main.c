@@ -6,7 +6,7 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 07:19:26 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/09 04:21:02 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/09 07:35:23 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ static void	init_info(int argc, char *argv[], t_info *info)
 	info->cmd_cnt = argc - 3;
 	info->pipe_cnt = info->cmd_cnt - 1;
 	info->env = NULL;
+	info->heredoc = false;
 	info->cmd[1] = NULL;
 	info->cmd[2] = NULL;
 }
