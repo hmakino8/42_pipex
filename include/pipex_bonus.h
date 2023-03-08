@@ -6,7 +6,7 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 19:08:02 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/06 21:46:56 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/09 04:46:41 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ enum e_err
 }	t_err;
 
 /* get_info_bonus.c */
-void	get_io_file(t_info *info);
+void	get_io_file(char *filename, int *io_file, bool is_in, bool heredoc);
 void	get_env(char **env, t_info *info);
 void	get_cmd_path(t_info *info);
 

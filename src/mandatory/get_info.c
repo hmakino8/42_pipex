@@ -6,7 +6,7 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 07:26:41 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/09 04:20:36 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/09 05:33:42 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,18 +46,18 @@ void	get_env(char **environ, t_info *info)
 
 void	get_cmd_path(t_info *info)
 {
-	int		i;
 	char	*tmp;
 	char	*cmd_path;
 
+	if (*info->cmd == NULL || **info->cmd == '\0')
+		error_exit(ERR_CMD, NULL);
 	tmp = NULL;
 	cmd_path = NULL;
-	i = 0;
-	while (info->env[i])
+	while (*info->env)
 	{
-		if (ft_strchr(info->cmd[0], '/') == NULL)
-			tmp = ft_strjoin(info->env[i], "/");
-		cmd_path = ft_strjoin(tmp, info->cmd[0]);
+		if (ft_strchr(*info->cmd, '/') == NULL)
+			tmp = ft_strjoin(*info->env, "/");
+		cmd_path = ft_strjoin(tmp, *info->cmd);
 		if (errno == ENOMEM)
 			error_exit(0, "malloc");
 		free(tmp);
@@ -65,7 +65,9 @@ void	get_cmd_path(t_info *info)
 			break ;
 		free(cmd_path);
 		cmd_path = NULL;
-		i++;
+		info->env++;
 	}
-	info->cmd[0] = cmd_path;
+	if (cmd_path == NULL)
+		error_exit(ERR_CMD, *info->cmd);
+	*info->cmd = cmd_path;
 }

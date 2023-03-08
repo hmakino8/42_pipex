@@ -6,48 +6,32 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/06 22:56:06 by hiroaki           #+#    #+#             */
-/*   Updated: 2023/03/09 01:30:31 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/09 05:32:55 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
 
-static void	is_valid_fd(char *infile, char *outfile, int e, t_info *info);
 static int	heredoc_to_fd(char *limiter);
 
-void	get_io_file(t_info *info)
+void	get_io_file(char *filename, int *io_file, bool is_in, bool heredoc)
 {
-	int		e;
-	char	*infile;
-	char	*outfile;
-	char	*limiter;
-
-	infile = info->agv[1];
-	outfile = info->agv[info->agc - 1];
-	limiter = info->agv[2];
-	if (info->heredoc)
+	if (is_in)
 	{
-		info->io_file[IN] = heredoc_to_fd(limiter);
-		e = errno;
-		info->io_file[OUT] = open(outfile, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		if (heredoc)
+			*io_file = heredoc_to_fd(filename);
+		else
+			*io_file = open(filename, O_RDONLY);
 	}
 	else
+		*io_file = open(filename, O_CREAT | O_RDWR | O_TRUNC, 0644);
+	if (*io_file < 0)
 	{
-		info->io_file[IN] = open(infile, O_RDONLY);
-		e = errno;
-		info->io_file[OUT] = open(outfile, O_CREAT | O_RDWR | O_TRUNC, 0644);
+		if (errno == ENOENT)
+			error_exit(ERR_PATH, filename);
+		else
+			error_exit(0, "open");
 	}
-	is_valid_fd(infile, outfile, e, info);
-}
-
-static void	is_valid_fd(char *infile, char *outfile, int e, t_info *info)
-{
-	if (info->io_file[IN] < 0 && e == ENOENT)
-		perror(infile);
-	else if (info->io_file[OUT] < 0 && errno == ENOENT)
-		perror(outfile);
-	if (errno != ENOENT && errno != 0)
-		error_exit(0, "open");
 }
 
 void	get_env(char **environ, t_info *info)
@@ -57,7 +41,7 @@ void	get_env(char **environ, t_info *info)
 	while (1)
 	{
 		if (*environ == NULL)
-			error_exit(ERR_PATH, NULL);
+			error_exit(ERR_PATH, info->cmd[0]);
 		if (!ft_strncmp("PATH=", *environ, 5))
 			break ;
 		environ++;
@@ -69,18 +53,18 @@ void	get_env(char **environ, t_info *info)
 
 void	get_cmd_path(t_info *info)
 {
-	int		i;
 	char	*tmp;
 	char	*cmd_path;
 
+	if (*info->cmd == NULL || **info->cmd == '\0')
+		error_exit(ERR_CMD, *info->cmd);
 	tmp = NULL;
 	cmd_path = NULL;
-	i = 0;
-	while (info->env[i])
+	while (*info->env)
 	{
-		if (ft_strchr(info->cmd[0], '/') == NULL)
-			tmp = ft_strjoin(info->env[i], "/");
-		cmd_path = ft_strjoin(tmp, info->cmd[0]);
+		if (ft_strchr(*info->cmd, '/') == NULL)
+			tmp = ft_strjoin(*info->env, "/");
+		cmd_path = ft_strjoin(tmp, *info->cmd);
 		if (errno == ENOMEM)
 			error_exit(0, "malloc");
 		free(tmp);
@@ -88,9 +72,11 @@ void	get_cmd_path(t_info *info)
 			break ;
 		free(cmd_path);
 		cmd_path = NULL;
-		i++;
+		info->env++;
 	}
-	info->cmd[0] = cmd_path;
+	if (cmd_path == NULL)
+		error_exit(ERR_CMD, *info->cmd);
+	*info->cmd = cmd_path;
 }
 
 static int	heredoc_to_fd(char *limiter)
