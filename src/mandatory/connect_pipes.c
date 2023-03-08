@@ -6,7 +6,7 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 17:43:01 by hiroaki           #+#    #+#             */
-/*   Updated: 2023/03/06 19:41:55 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/09 04:22:12 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,12 +32,14 @@ void	connect_io_file(int i, int pipe_cnt, t_info *info)
 {
 	if (i == 0)
 	{
-		if (info->io_file[0] < 0)
-			exit(EXIT_FAILURE);
+		get_io_file(info->agv[1], &info->io_file[IN], true);
 		set_stdin(info->io_file);
 	}
 	if (i == pipe_cnt)
+	{
+		get_io_file(info->agv[info->agc - 1], &info->io_file[OUT], false);
 		set_stdout(info->io_file);
+	}
 }
 
 void	close_io_fd(int fd[2])

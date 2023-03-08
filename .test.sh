@@ -1,7 +1,7 @@
 #!/usr/local/bin/bash
 
 i=1
-echo -e "\e[31m =============== ERROR TEST ===============\n\e[m"
+echo -e "\n\e[31m =============== ERROR TEST ===============\n\e[m"
 
 #test1
 TEST="./pipex"
@@ -102,6 +102,20 @@ echo -e "\e[36m => diff testfile1 testfile1-2\e[m"
 diff testfile1 testfile1-2
 
 #test11
+echo -e "\n\e[31m [test$((i++)): "./pipex \"\" \"ls\" \"cat\" \"\""]\e[m"
+./pipex "" "ls" "cat" ""
+
+echo -e "\n\e[36m => should behave in bash as:\e[m"
+< "" ls | cat > ""
+
+#test12
+echo -e "\n\e[31m [test$((i++)): "./pipex \"\" \"\" \"\" \"\""]\e[m"
+./pipex "" "" "" ""
+
+echo -e "\n\e[36m => should behave in bash as:\e[m"
+< "" "" | "" > ""
+
+#test13
 echo -e "\n\e[33m creating a testfile with 100 million 'a' ... \e[m"
 ruby -e 'puts "a" * 100000000' > testfile
 
@@ -111,5 +125,17 @@ echo -e "\n\e[31m [test$((i++)): "./pipex testfile \"grep a\" \"wc -c\" testfile
 < testfile grep a | wc -c > testfile1-2
 echo -e "\e[36m => diff testfile1 testfile1-2\e[m\n"
 diff testfile1 testfile1-2
+
+#test14
+echo -e "\e[33m unset PATH ... \e[m"
+TMP=$PATH
+unset PATH
+
+echo -e "\n\e[31m [test$((i++)): "./pipex testfile \"grep a\" \"wc -c\" testfile1"]\e[m"
+./pipex testfile "grep a" "wc -c'" testfile1
+
+echo -e "\n\e[36m => should behave in bash as:\e[m"
+< testfile grep a | wc -c > testfile1-2
+PATH=$TMP
 
 rm pipex manfile *testfile* 2&> /dev/null

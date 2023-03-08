@@ -6,7 +6,7 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 07:19:26 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/09 00:26:10 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/09 04:21:02 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ int	main(int argc, char *argv[])
 
 	check_arg(argc);
 	init_info(argc, argv, &info);
-	get_io_file(&info);
 	exec_pipes(&info);
 	wait_child(&info);
 	free_double_ptr(info.env);
