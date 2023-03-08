@@ -6,29 +6,35 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 07:26:41 by hmakino           #+#    #+#             */
-/*   Updated: 2023/03/06 19:38:49 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/09 01:33:54 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
+static void	is_valid_fd(char *infile, char *outfile, int e, t_info *info);
+
 void	get_io_file(t_info *info)
 {
+	int		e;
 	char	*infile;
 	char	*outfile;
 
 	infile = info->agv[1];
 	outfile = info->agv[info->agc - 1];
 	info->io_file[IN] = open(infile, O_RDONLY);
-	if (info->io_file[IN] < 0)
-	{
-		if (errno == ENOENT)
-			perror(infile);
-		else
-			error_exit(0, "open");
-	}
+	e = errno;
 	info->io_file[OUT] = open(outfile, O_CREAT | O_RDWR | O_TRUNC, 0644);
-	if (info->io_file[OUT] < 0)
+	is_valid_fd(infile, outfile, e, info);
+}
+
+static void	is_valid_fd(char *infile, char *outfile, int e, t_info *info)
+{
+	if (info->io_file[IN] < 0 && e == ENOENT)
+		perror(infile);
+	else if (info->io_file[OUT] < 0 && errno == ENOENT)
+		perror(outfile);
+	if (errno != ENOENT && errno != 0)
 		error_exit(0, "open");
 }
 

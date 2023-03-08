@@ -26,10 +26,11 @@ else
 	echo -e "\e[31mtestfile is NOT created\e[m"
 fi
 
-echo -e "\n\e[31m => should behave in bash as:\e[m"
+echo -e "\n\e[36m => should behave in bash as:\e[m"
 < nosuchfile nosuchcmd1 | nosuchcmd2 > testfile1-2
 
 #test4
+echo -e "\n\e[33m creating a manfile for linux pipe ... \e[m"
 man pipe > manfile
 TEST="./pipex manfile cat nosuchcmd testfile2"
 echo -e "\n\e[31m [test$((i++)): $TEST]\e[m"
@@ -41,7 +42,7 @@ else
 	echo -e "\e[31mtestfile is NOT created\e[m"
 fi
 
-echo -e "\n\e[31m => should behave in bash as:\e[m"
+echo -e "\n\e[36m => should behave in bash as:\e[m"
 < manfile cat | nosuchcmd > testfile2-2
 
 #test5
@@ -55,43 +56,60 @@ else
 	echo -e "\e[31mtestfile is NOT created\e[m"
 fi
 
-echo -e "\n\e[31m => should behave in bash as:\e[m"
+echo -e "\n\e[36m => should behave in bash as:\e[m"
 < manfile nosuchcmd | cat > testfile3-2
 
 echo -e "\n\e[31m =============== DIFF TEST ===============\e[m"
 
 #test6
+echo -e "\n\e[31m [test$((i++)): "./pipex manfile \"ls -l\" \"wc -l\" testfile1"]\e[m"
+ ./pipex manfile "ls -l" "wc -l" testfile1
+
+ < manfile ls -l | wc -l > testfile1-2
+echo -e "\e[36m => diff testfile1 testfile1-2\e[m"
+diff testfile1 testfile1-2
+
+#test7
+echo -e "\n\e[31m [test$((i++)): "./pipex manfile \"grep a1\" \"wc -w\" testfile1"]\e[m"
+ ./pipex manfile "grep a1" "wc -w" testfile1
+
+ < manfile grep a1 | wc -w > testfile1-2
+echo -e "\e[36m => diff testfile1 testfile1-2\e[m"
+diff testfile1 testfile1-2
+
+#test8
 echo -e "\n\e[31m [test$((i++)): "./pipex manfile cat \"grep PIPE\" testfile1"]\e[m"
 ./pipex manfile cat "grep PIPE" testfile1
 
 < manfile cat | grep PIPE > testfile1-2
-echo -e "\n\e[31m => diff testfile1 testfile1-2\e[m"
+echo -e "\e[36m => diff testfile1 testfile1-2\e[m"
 diff testfile1 testfile1-2
 
-#test7
+#test9
 echo -e "\n\e[31m [test$((i++)): "./pipex manfile \"grep PIPE\" \"wc -c\" testfile1"]\e[m"
 ./pipex manfile "grep PIPE" "wc -c" testfile1
 
 < manfile grep PIPE | wc -c > testfile1-2
-echo -e "\n\e[31m => diff testfile1 testfile1-2\e[m"
+echo -e "\e[36m => diff testfile1 testfile1-2\e[m"
 diff testfile1 testfile1-2
 
-#test8
+#test10
 echo -e "\n\e[31m [test$((i++)): "./pipex manfile \"grep PIPE\" \"awk '{print \$2}'\" testfile1"]\e[m"
 ./pipex manfile "grep PIPE" "awk '{print \$2}'" testfile1
 
 < manfile grep PIPE | awk '{print $2}' > testfile1-2
-echo -e "\n\e[31m => diff testfile1 testfile1-2\e[m"
+echo -e "\e[36m => diff testfile1 testfile1-2\e[m"
 diff testfile1 testfile1-2
 
-#test9
+#test11
+echo -e "\n\e[33m creating a testfile with 100 million 'a' ... \e[m"
 ruby -e 'puts "a" * 100000000' > testfile
 
 echo -e "\n\e[31m [test$((i++)): "./pipex testfile \"grep a\" \"wc -c\" testfile1"]\e[m"
 ./pipex testfile "grep a" "wc -c'" testfile1
 
 < testfile grep a | wc -c > testfile1-2
-echo -e "\n\e[31m => diff testfile1 testfile1-2\e[m"
+echo -e "\e[36m => diff testfile1 testfile1-2\e[m\n"
 diff testfile1 testfile1-2
 
 rm pipex manfile *testfile* 2&> /dev/null

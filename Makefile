@@ -56,13 +56,15 @@ fclean:	clean
 re:	fclean all
 
 test:
-	make re
-	./.test.sh
+	make re -s
+	-@./.test.sh
+	make fclean -s
 
 bonustest:
-	make fclean
-	make bonus
-	./.test_bonus.sh
+	make fclean -s
+	make bonus -s
+	-@./.test_bonus.sh
+	make fclean -s
 
 bonus:
 	make WITH_BONUS=1

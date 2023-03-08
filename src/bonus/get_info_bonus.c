@@ -6,7 +6,7 @@
 /*   By: hiroaki <hiroaki@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/06 22:56:06 by hiroaki           #+#    #+#             */
-/*   Updated: 2023/03/06 22:56:22 by hiroaki          ###   ########.fr       */
+/*   Updated: 2023/03/09 01:30:31 by hiroaki          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ static void	is_valid_fd(char *infile, char *outfile, int e, t_info *info)
 		perror(infile);
 	else if (info->io_file[OUT] < 0 && errno == ENOENT)
 		perror(outfile);
-	if (info->io_file[IN] < 0 || info->io_file[OUT] < 0)
+	if (errno != ENOENT && errno != 0)
 		error_exit(0, "open");
 }
 
